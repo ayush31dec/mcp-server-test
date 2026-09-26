@@ -7,14 +7,15 @@ import os
 import sqlite3
 from pathlib import Path
 
-DB_PATH = Path(
-    os.environ.get(
-        "TIMETRACK_DB_PATH",
-        str(Path(__file__).resolve().parent / "timetrack.db")
-    )
+DEFAULT_DB_PATH = (
+    Path(__file__).resolve().parent / "timetrack.db"
+    if os.name == "nt"
+    else Path("/tmp/timetrack.db")
 )
+DB_PATH = Path(os.environ.get("TIMETRACK_DB_PATH", str(DEFAULT_DB_PATH)))
 
 def get_connection():
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
